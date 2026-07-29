@@ -270,24 +270,41 @@
             .container { flex-direction: column; align-items: center; }
             .panel { min-width: unset; width: 100%; }
         }
+
+        .lang-selector {
+            position: fixed;
+            top: 12px;
+            right: 16px;
+            z-index: 1000;
+            background: #16213e;
+            border: 1px solid #00d4ff;
+            border-radius: 6px;
+            padding: 5px 10px;
+            color: #00d4ff;
+            font-size: 0.85em;
+            cursor: pointer;
+            outline: none;
+        }
+        .lang-selector option {
+            background: #16213e;
+            color: #eee;
+        }
     </style>
 </head>
 <body>
-    <h1>🧩 2x2 Pocket Cube Simulator</h1>
-    <p class="subtitle">Learn patterns, follow formulas, and solve with 3D animation!</p>
+    <select class="lang-selector" onchange="setLanguage(this.value)">
+        <option value="en">🇬🇧 English</option>
+        <option value="zh">🇨🇳 中文</option>
+        <option value="sv">🇸🇪 Svenska</option>
+    </select>
+    <h1 data-i18n="title">🧩 2x2 Pocket Cube Simulator</h1>
+    <p class="subtitle" data-i18n="subtitle">Learn patterns, follow formulas, and solve with 3D animation!</p>
 
     <div class="container">
         <!-- 3D Cube -->
         <div class="panel" style="display:flex; flex-direction:column; align-items:center;">
-            <h2>3D Cube View</h2>
-            <div class="legend">
-                <div class="legend-item"><div class="legend-swatch c-W"></div>White (U)</div>
-                <div class="legend-item"><div class="legend-swatch c-Y"></div>Yellow (D)</div>
-                <div class="legend-item"><div class="legend-swatch c-R"></div>Red (F)</div>
-                <div class="legend-item"><div class="legend-swatch c-O"></div>Orange (B)</div>
-                <div class="legend-item"><div class="legend-swatch c-B"></div>Blue (R)</div>
-                <div class="legend-item"><div class="legend-swatch c-G"></div>Green (L)</div>
-            </div>
+            <h2 data-i18n="cube_view">3D Cube View</h2>
+            <div class="legend" id="color-legend"></div>
             <div class="cube-scene">
                 <div class="cube-pivot" id="cube-pivot"></div>
             </div>
@@ -306,50 +323,50 @@
                 <button onclick="doMove('B\'')">B'</button>
             </div>
             <div class="btn-row">
-                <button class="btn btn-danger" onclick="resetCube()">Reset</button>
-                <button class="btn btn-secondary" onclick="scrambleCube()">Scramble</button>
+                <button class="btn btn-danger" onclick="resetCube()" data-i18n="reset">Reset</button>
+                <button class="btn btn-secondary" onclick="scrambleCube()" data-i18n="scramble">Scramble</button>
             </div>
         </div>
 
         <!-- Color Input / Solver -->
         <div class="panel">
-            <h2>🎨 Map Your Physical Cube</h2>
-            <p style="font-size:0.82em; color:#aaa; margin-bottom:8px;">1. Pick a color below, then click tiles on the net to paint your cube's state. 2. Click "Solve It!" to get a solution.</p>
+            <h2 data-i18n="map_cube">🎨 Map Your Physical Cube</h2>
+            <p style="font-size:0.82em; color:#aaa; margin-bottom:8px;" data-i18n="map_instructions">1. Pick a color below, then click tiles on the net to paint your cube's state. 2. Click "Solve It!" to get a solution.</p>
 
             <div class="color-palette" id="color-palette"></div>
 
             <div class="net-container" id="cube-net"></div>
 
             <div class="btn-row">
-                <button class="btn btn-primary" onclick="solveFromInput()">Solve It!</button>
-                <button class="btn btn-secondary" onclick="applyInputToCube()">Load into 3D</button>
-                <button class="btn btn-secondary" onclick="clearNet()">Clear Net</button>
+                <button class="btn btn-primary" onclick="solveFromInput()" data-i18n="solve_it">Solve It!</button>
+                <button class="btn btn-secondary" onclick="applyInputToCube()" data-i18n="load_3d">Load into 3D</button>
+                <button class="btn btn-secondary" onclick="clearNet()" data-i18n="clear_net">Clear Net</button>
             </div>
             <div class="solver-output" id="solver-output">
-                <div class="step-info">Paint your cube, then click "Solve It!"</div>
+                <div class="step-info" data-i18n="solver_hint">Paint your cube, then click "Solve It!"</div>
             </div>
 
             <div class="solve-area" style="margin-top:15px;">
                 <div class="btn-row">
-                    <button class="btn btn-primary" onclick="playSolveAnimation()">▶ Play Solution</button>
-                    <button class="btn btn-secondary" onclick="nextSolverStep()">Next Step ▶</button>
+                    <button class="btn btn-primary" onclick="playSolveAnimation()" data-i18n="play_solution">▶ Play Solution</button>
+                    <button class="btn btn-secondary" onclick="nextSolverStep()" data-i18n="next_step">Next Step ▶</button>
                 </div>
                 <div class="step-display" id="solver-step-display">
-                    <div class="step-info">Solve first, then play the solution step-by-step.</div>
+                    <div class="step-info" data-i18n="solver_play_hint">Solve first, then play the solution step-by-step.</div>
                 </div>
             </div>
         </div>
 
         <!-- Patterns & Solving -->
         <div class="panel">
-            <h2>📋 Patterns to Learn</h2>
-            <p style="font-size:0.82em; color:#aaa; margin-bottom:10px;">Select a pattern, then click "Apply Pattern" to scramble, or "Solve Step-by-Step" to watch the solution animated.</p>
+            <h2 data-i18n="patterns_title">📋 Patterns to Learn</h2>
+            <p style="font-size:0.82em; color:#aaa; margin-bottom:10px;" data-i18n="patterns_instructions">Select a pattern, then click "Apply Pattern" to scramble, or "Solve Step-by-Step" to watch the solution animated.</p>
 
             <div class="solve-area" style="margin-top:0; margin-bottom:15px;">
                 <div class="btn-row">
-                    <button class="btn btn-primary" onclick="applyPattern()">Apply Pattern</button>
-                    <button class="btn btn-primary" onclick="solveStepByStep()">Solve Step-by-Step</button>
-                    <button class="btn btn-secondary" onclick="nextStep()">Next Step ▶</button>
+                    <button class="btn btn-primary" onclick="applyPattern()" data-i18n="apply_pattern">Apply Pattern</button>
+                    <button class="btn btn-primary" onclick="solveStepByStep()" data-i18n="solve_step">Solve Step-by-Step</button>
+                    <button class="btn btn-secondary" onclick="nextStep()" data-i18n="next_step">Next Step ▶</button>
                 </div>
                 <div class="step-display" id="step-display">
                     <div class="step-info">Select a pattern and click "Solve Step-by-Step" to begin.</div>
@@ -359,14 +376,14 @@
             <ul class="pattern-list" id="pattern-list"></ul>
 
             <div class="notation-help">
-                <h3>Notation Guide</h3>
-                <p><code>R</code> = Right face clockwise &nbsp; <code>R'</code> = Right face counter-clockwise</p>
-                <p><code>U</code> = Up face clockwise &nbsp; <code>U'</code> = Up face counter-clockwise</p>
-                <p><code>F</code> = Front face clockwise &nbsp; <code>F'</code> = Front face counter-clockwise</p>
-                <p><code>L</code> = Left face clockwise &nbsp; <code>L'</code> = Left face counter-clockwise</p>
-                <p><code>D</code> = Down face clockwise &nbsp; <code>D'</code> = Down face counter-clockwise</p>
-                <p><code>B</code> = Back face clockwise &nbsp; <code>B'</code> = Back face counter-clockwise</p>
-                <p style="margin-top:8px; color:#888;">Tip: A prime (') means counter-clockwise. No prime means clockwise.</p>
+                <h3 data-i18n="notation_title">Notation Guide</h3>
+                <p data-i18n="notation_R"><code>R</code> = Right face clockwise &nbsp; <code>R'</code> = Right face counter-clockwise</p>
+                <p data-i18n="notation_U"><code>U</code> = Up face clockwise &nbsp; <code>U'</code> = Up face counter-clockwise</p>
+                <p data-i18n="notation_F"><code>F</code> = Front face clockwise &nbsp; <code>F'</code> = Front face counter-clockwise</p>
+                <p data-i18n="notation_L"><code>L</code> = Left face clockwise &nbsp; <code>L'</code> = Left face counter-clockwise</p>
+                <p data-i18n="notation_D"><code>D</code> = Down face clockwise &nbsp; <code>D'</code> = Down face counter-clockwise</p>
+                <p data-i18n="notation_B"><code>B</code> = Back face clockwise &nbsp; <code>B'</code> = Back face counter-clockwise</p>
+                <p style="margin-top:8px; color:#888;" data-i18n="notation_tip">Tip: A prime (') means counter-clockwise. No prime means clockwise.</p>
             </div>
         </div>
     </div>
@@ -375,6 +392,158 @@
     // ========================================================
     // 2x2 POCKET CUBE — Cubie-based 3D with face-turn animation
     // ========================================================
+
+    // ===== INTERNATIONALIZATION =====
+    const i18n = {
+        en: {
+            title: '🧩 2x2 Pocket Cube Simulator',
+            subtitle: 'Learn patterns, follow formulas, and solve with 3D animation!',
+            cube_view: '3D Cube View',
+            reset: 'Reset',
+            scramble: 'Scramble',
+            map_cube: '🎨 Map Your Physical Cube',
+            map_instructions: '1. Pick a color below, then click tiles on the net to paint your cube\'s state. 2. Click "Solve It!" to get a solution.',
+            solve_it: 'Solve It!',
+            load_3d: 'Load into 3D',
+            clear_net: 'Clear Net',
+            play_solution: '▶ Play Solution',
+            next_step: 'Next Step ▶',
+            patterns_title: '📋 Patterns to Learn',
+            patterns_instructions: 'Select a pattern, then click "Apply Pattern" to scramble, or "Solve Step-by-Step" to watch the solution animated.',
+            apply_pattern: 'Apply Pattern',
+            solve_step: 'Solve Step-by-Step',
+            notation_title: 'Notation Guide',
+            notation_R: '<code>R</code> = Right face clockwise &nbsp; <code>R\'</code> = Right face counter-clockwise',
+            notation_U: '<code>U</code> = Up face clockwise &nbsp; <code>U\'</code> = Up face counter-clockwise',
+            notation_F: '<code>F</code> = Front face clockwise &nbsp; <code>F\'</code> = Front face counter-clockwise',
+            notation_L: '<code>L</code> = Left face clockwise &nbsp; <code>L\'</code> = Left face counter-clockwise',
+            notation_D: '<code>D</code> = Down face clockwise &nbsp; <code>D\'</code> = Down face counter-clockwise',
+            notation_B: '<code>B</code> = Back face clockwise &nbsp; <code>B\'</code> = Back face counter-clockwise',
+            notation_tip: 'Tip: A prime (\') means counter-clockwise. No prime means clockwise.',
+            step_select: 'Select a pattern and click "Solve Step-by-Step" to begin.',
+            step_progress: 'Step {0} of {1} — Click "Next Step ▶" to continue',
+            step_solved: 'The cube is solved! Click Reset to try again.',
+            step_inverse: 'Solution (inverse of formula):',
+            solver_hint: 'Paint your cube, then click "Solve It!"',
+            solver_play_hint: 'Solve first, then play the solution step-by-step.',
+            color_W: 'White', color_Y: 'Yellow', color_R: 'Red', color_O: 'Orange', color_B: 'Blue', color_G: 'Green',
+            pat_Checkerboard: 'Checkerboard', pat_Checkerboard_d: 'Alternating colors on each face',
+            pat_DiagonalSwap: 'Diagonal Swap', pat_DiagonalSwap_d: 'Swap diagonal corners on front face',
+            pat_ColumnSwap: 'Column Swap', pat_ColumnSwap_d: 'Swap right column of front and right faces',
+            pat_AntiSune: 'Anti-Sune', pat_AntiSune_d: 'Twist 3 corners counter-clockwise',
+            pat_Sune: 'Sune', pat_Sune_d: 'Twist 3 corners clockwise',
+            pat_TPattern: 'T-Pattern', pat_TPattern_d: 'Creates a T shape on the front face',
+            pat_Bruno: 'Bruno', pat_Bruno_d: 'A quick 4-move scramble',
+            pat_Niklas: 'Niklas', pat_Niklas_d: 'Classic 3-cycle of corners',
+        },
+        zh: {
+            title: '🧩 二阶魔方模拟器',
+            subtitle: '学习公式、跟随步骤、用3D动画解魔方！',
+            cube_view: '3D 魔方视图',
+            reset: '重置',
+            scramble: '打乱',
+            map_cube: '🎨 映射你的实体魔方',
+            map_instructions: '1. 选择下方颜色，点击展开图上的格子涂色。2. 点击"求解"获得解法。',
+            solve_it: '求解！',
+            load_3d: '载入3D',
+            clear_net: '清除',
+            play_solution: '▶ 播放解法',
+            next_step: '下一步 ▶',
+            patterns_title: '📋 学习公式',
+            patterns_instructions: '选择一个公式，点击"应用公式"打乱，或点击"逐步求解"观看动画。',
+            apply_pattern: '应用公式',
+            solve_step: '逐步求解',
+            notation_title: '符号说明',
+            notation_R: '<code>R</code> = 右面顺时针 &nbsp; <code>R\'</code> = 右面逆时针',
+            notation_U: '<code>U</code> = 顶面顺时针 &nbsp; <code>U\'</code> = 顶面逆时针',
+            notation_F: '<code>F</code> = 前面顺时针 &nbsp; <code>F\'</code> = 前面逆时针',
+            notation_L: '<code>L</code> = 左面顺时针 &nbsp; <code>L\'</code> = 左面逆时针',
+            notation_D: '<code>D</code> = 底面顺时针 &nbsp; <code>D\'</code> = 底面逆时针',
+            notation_B: '<code>B</code> = 后面顺时针 &nbsp; <code>B\'</code> = 后面逆时针',
+            notation_tip: '提示：带撇号（\'）表示逆时针，不带表示顺时针。',
+            step_select: '选择一个公式，点击"逐步求解"开始。',
+            step_progress: '第 {0} 步，共 {1} 步 — 点击"下一步 ▶"继续',
+            step_solved: '魔方已还原！点击重置再试一次。',
+            step_inverse: '解法（公式的逆序）：',
+            solver_hint: '涂好你的魔方，然后点击"求解！"',
+            solver_play_hint: '先求解，再逐步播放解法。',
+            color_W: '白色', color_Y: '黄色', color_R: '红色', color_O: '橙色', color_B: '蓝色', color_G: '绿色',
+            pat_Checkerboard: '棋盘格', pat_Checkerboard_d: '每面交替颜色',
+            pat_DiagonalSwap: '对角交换', pat_DiagonalSwap_d: '交换前面的对角块',
+            pat_ColumnSwap: '列交换', pat_ColumnSwap_d: '交换前面和右面的右列',
+            pat_AntiSune: '逆Sune', pat_AntiSune_d: '逆时针扭转3个角块',
+            pat_Sune: 'Sune', pat_Sune_d: '顺时针扭转3个角块',
+            pat_TPattern: 'T形', pat_TPattern_d: '在前面形成T形图案',
+            pat_Bruno: 'Bruno', pat_Bruno_d: '快速4步打乱',
+            pat_Niklas: 'Niklas', pat_Niklas_d: '经典角块三轮换',
+        },
+        sv: {
+            title: '🧩 2x2 Pocketkub-simulator',
+            subtitle: 'Lär dig mönster, följ formler och lös med 3D-animation!',
+            cube_view: '3D-kubvy',
+            reset: 'Återställ',
+            scramble: 'Blanda',
+            map_cube: '🎨 Mappa din fysiska kub',
+            map_instructions: '1. Välj en färg nedan och klicka på rutorna för att måla din kubs tillstånd. 2. Klicka "Lös!" för en lösning.',
+            solve_it: 'Lös!',
+            load_3d: 'Ladda i 3D',
+            clear_net: 'Rensa',
+            play_solution: '▶ Spela lösning',
+            next_step: 'Nästa steg ▶',
+            patterns_title: '📋 Mönster att lära',
+            patterns_instructions: 'Välj ett mönster, klicka "Applicera" för att blanda, eller "Lös steg-för-steg" för att se animationen.',
+            apply_pattern: 'Applicera mönster',
+            solve_step: 'Lös steg-för-steg',
+            notation_title: 'Notationsguide',
+            notation_R: '<code>R</code> = Höger sida medurs &nbsp; <code>R\'</code> = Höger sida moturs',
+            notation_U: '<code>U</code> = Ovansida medurs &nbsp; <code>U\'</code> = Ovansida moturs',
+            notation_F: '<code>F</code> = Framsida medurs &nbsp; <code>F\'</code> = Framsida moturs',
+            notation_L: '<code>L</code> = Vänster sida medurs &nbsp; <code>L\'</code> = Vänster sida moturs',
+            notation_D: '<code>D</code> = Undersida medurs &nbsp; <code>D\'</code> = Undersida moturs',
+            notation_B: '<code>B</code> = Baksida medurs &nbsp; <code>B\'</code> = Baksida moturs',
+            notation_tip: 'Tips: Ett primtecken (\') betyder moturs. Utan primtecken = medurs.',
+            step_select: 'Välj ett mönster och klicka "Lös steg-för-steg" för att börja.',
+            step_progress: 'Steg {0} av {1} — Klicka "Nästa steg ▶" för att fortsätta',
+            step_solved: 'Kuben är löst! Klicka Återställ för att prova igen.',
+            step_inverse: 'Lösning (invers av formeln):',
+            solver_hint: 'Måla din kub, klicka sedan "Lös!"',
+            solver_play_hint: 'Lös först, spela sedan lösningen steg-för-steg.',
+            color_W: 'Vit', color_Y: 'Gul', color_R: 'Röd', color_O: 'Orange', color_B: 'Blå', color_G: 'Grön',
+            pat_Checkerboard: 'Schackbräde', pat_Checkerboard_d: 'Alternerande färger på varje sida',
+            pat_DiagonalSwap: 'Diagonalbytet', pat_DiagonalSwap_d: 'Byt diagonala hörn på framsidan',
+            pat_ColumnSwap: 'Kolumnbytet', pat_ColumnSwap_d: 'Byt höger kolumn mellan fram- och högersida',
+            pat_AntiSune: 'Anti-Sune', pat_AntiSune_d: 'Vrid 3 hörn moturs',
+            pat_Sune: 'Sune', pat_Sune_d: 'Vrid 3 hörn medurs',
+            pat_TPattern: 'T-mönster', pat_TPattern_d: 'Skapar ett T på framsidan',
+            pat_Bruno: 'Bruno', pat_Bruno_d: 'En snabb 4-drags blandning',
+            pat_Niklas: 'Niklas', pat_Niklas_d: 'Klassisk 3-cykel av hörn',
+        }
+    };
+    let currentLang = 'en';
+    function t(key) { return i18n[currentLang][key] || i18n['en'][key] || key; }
+
+    function setLanguage(lang) {
+        currentLang = lang;
+        document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang;
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            const text = t(key);
+            if (text) el.innerHTML = text;
+        });
+        renderPatterns();
+        renderPalette();
+        renderLegend();
+        if (selectedPattern !== null) selectPattern(selectedPattern);
+        updateStepDisplay();
+        const solverOutput = document.getElementById('solver-output');
+        if (solverOutput && !solverOutput.querySelector('.all-steps')) {
+            solverOutput.innerHTML = '<div class="step-info">' + t('solver_hint') + '</div>';
+        }
+        const solverStepDisplay = document.getElementById('solver-step-display');
+        if (solverStepDisplay && !solverStepDisplay.querySelector('.all-steps')) {
+            solverStepDisplay.innerHTML = '<div class="step-info">' + t('solver_play_hint') + '</div>';
+        }
+    }
 
     // The 8 cubies of a 2x2: position [x, y, z] where each is 0 or 1
     // x: 0=left, 1=right
@@ -428,14 +597,14 @@
 
     // ===== PATTERNS =====
     const patterns = [
-        { name: "Checkerboard", description: "Alternating colors on each face", formula: "R2 F2 R2", inverse: "R2 F2 R2" },
-        { name: "Diagonal Swap", description: "Swap diagonal corners on front face", formula: "F R U R' U' F'", inverse: "F U R U' R' F'" },
-        { name: "Column Swap", description: "Swap right column of front and right faces", formula: "R U R' U R U2 R'", inverse: "R U2 R' U' R U' R'" },
-        { name: "Anti-Sune", description: "Twist 3 corners counter-clockwise", formula: "R U2 R' U' R U' R'", inverse: "R U R' U R U2 R'" },
-        { name: "Sune", description: "Twist 3 corners clockwise", formula: "R U R' U R U2 R'", inverse: "R U2 R' U' R U' R'" },
-        { name: "T-Pattern", description: "Creates a T shape on the front face", formula: "R U R' U' R' F R F'", inverse: "F R' F' R U R U' R'" },
-        { name: "Bruno", description: "A quick 4-move scramble", formula: "R U R' F", inverse: "F' R U' R'" },
-        { name: "Niklas", description: "Classic 3-cycle of corners", formula: "R U' L' U R' U' L U", inverse: "U' L' U R U' L U R'" },
+        { name: "Checkerboard", key: "Checkerboard", description: "Alternating colors on each face", formula: "R2 F2 R2", inverse: "R2 F2 R2" },
+        { name: "Diagonal Swap", key: "DiagonalSwap", description: "Swap diagonal corners on front face", formula: "F R U R' U' F'", inverse: "F U R U' R' F'" },
+        { name: "Column Swap", key: "ColumnSwap", description: "Swap right column of front and right faces", formula: "R U R' U R U2 R'", inverse: "R U2 R' U' R U' R'" },
+        { name: "Anti-Sune", key: "AntiSune", description: "Twist 3 corners counter-clockwise", formula: "R U2 R' U' R U' R'", inverse: "R U R' U R U2 R'" },
+        { name: "Sune", key: "Sune", description: "Twist 3 corners clockwise", formula: "R U R' U R U2 R'", inverse: "R U2 R' U' R U' R'" },
+        { name: "T-Pattern", key: "TPattern", description: "Creates a T shape on the front face", formula: "R U R' U' R' F R F'", inverse: "F R' F' R U R U' R'" },
+        { name: "Bruno", key: "Bruno", description: "A quick 4-move scramble", formula: "R U R' F", inverse: "F' R U' R'" },
+        { name: "Niklas", key: "Niklas", description: "Classic 3-cycle of corners", formula: "R U' L' U R' U' L U", inverse: "U' L' U R U' L U R'" },
     ];
 
     // ===== MOVE LOGIC =====
@@ -708,10 +877,12 @@
             const li = document.createElement('li');
             li.onclick = () => selectPattern(idx);
             li.id = `pattern-${idx}`;
+            const name = t('pat_' + p.key) || p.name;
+            const desc = t('pat_' + p.key + '_d') || p.description;
             li.innerHTML = `
-                <span class="pattern-name">${p.name}</span>
+                <span class="pattern-name">${name}</span>
                 <span class="pattern-formula">${p.formula}</span>
-                <span style="font-size:0.78em;color:#888;display:block;margin-top:2px;">${p.description}</span>
+                <span style="font-size:0.78em;color:#888;display:block;margin-top:2px;">${desc}</span>
             `;
             list.appendChild(li);
         });
@@ -759,7 +930,7 @@
     function updateStepDisplay() {
         const display = document.getElementById('step-display');
         if (solveSteps.length === 0) {
-            display.innerHTML = '<div class="step-info">Select a pattern and click "Solve Step-by-Step" to begin.</div>';
+            display.innerHTML = '<div class="step-info">' + t('step_select') + '</div>';
             return;
         }
         const stepsHtml = solveSteps.map((s, i) => {
@@ -769,13 +940,13 @@
         }).join(' ');
 
         const current = currentStepIndex >= 0 ? solveSteps[currentStepIndex] : '—';
-        const progress = `Step ${currentStepIndex + 1} of ${solveSteps.length}`;
+        const progress = t('step_progress').replace('{0}', currentStepIndex + 1).replace('{1}', solveSteps.length);
         const isDone = currentStepIndex >= solveSteps.length - 1;
 
         display.innerHTML = `
             <div class="current-step">${isDone ? '✅ Solved!' : current}</div>
-            <div class="step-info">${isDone ? 'The cube is solved! Click Reset to try again.' : progress + ' — Click "Next Step ▶" to continue'}</div>
-            <div style="color:#888;font-size:0.78em;margin-top:4px;">Solution (inverse of formula):</div>
+            <div class="step-info">${isDone ? t('step_solved') : progress}</div>
+            <div style="color:#888;font-size:0.78em;margin-top:4px;">${t('step_inverse')}</div>
             <div class="all-steps">${stepsHtml}</div>
         `;
     }
@@ -886,10 +1057,18 @@
             const btn = document.createElement('div');
             btn.className = 'palette-btn' + (c.code === selectedColor ? ' selected' : '');
             btn.style.background = c.css;
-            btn.title = c.label;
+            btn.title = t('color_' + c.code) || c.label;
             btn.onclick = () => { selectedColor = c.code; renderPalette(); };
             pal.appendChild(btn);
         }
+    }
+
+    const legendFaces = [{code:'W',face:'U'},{code:'Y',face:'D'},{code:'R',face:'F'},{code:'O',face:'B'},{code:'B',face:'R'},{code:'G',face:'L'}];
+    function renderLegend() {
+        const el = document.getElementById('color-legend');
+        el.innerHTML = legendFaces.map(l =>
+            `<div class="legend-item"><div class="legend-swatch c-${l.code}"></div>${t('color_'+l.code)} (${l.face})</div>`
+        ).join('');
     }
 
     function renderNet() {
@@ -943,8 +1122,8 @@
     function clearNet() {
         for (const f of Object.keys(netState)) netState[f] = [null,null,null,null];
         renderNet();
-        document.getElementById('solver-output').innerHTML = '<div class="step-info">Paint your cube, then click "Solve It!"</div>';
-        document.getElementById('solver-step-display').innerHTML = '<div class="step-info">Solve first, then play the solution step-by-step.</div>';
+        document.getElementById('solver-output').innerHTML = '<div class="step-info">' + t('solver_hint') + '</div>';
+        document.getElementById('solver-step-display').innerHTML = '<div class="step-info">' + t('solver_play_hint') + '</div>';
     }
 
     // ===== Convert net state to cubies =====
@@ -1399,6 +1578,7 @@
     })();
 
     renderPalette();
+    renderLegend();
     syncNetFromCubies();
     </script>
 </body>
