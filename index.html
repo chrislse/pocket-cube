@@ -344,9 +344,8 @@
         <div class="panel">
             <h2>📋 Patterns to Learn</h2>
             <p style="font-size:0.82em; color:#aaa; margin-bottom:10px;">Select a pattern, then click "Apply Pattern" to scramble, or "Solve Step-by-Step" to watch the solution animated.</p>
-            <ul class="pattern-list" id="pattern-list"></ul>
 
-            <div class="solve-area">
+            <div class="solve-area" style="margin-top:0; margin-bottom:15px;">
                 <div class="btn-row">
                     <button class="btn btn-primary" onclick="applyPattern()">Apply Pattern</button>
                     <button class="btn btn-primary" onclick="solveStepByStep()">Solve Step-by-Step</button>
@@ -356,6 +355,8 @@
                     <div class="step-info">Select a pattern and click "Solve Step-by-Step" to begin.</div>
                 </div>
             </div>
+
+            <ul class="pattern-list" id="pattern-list"></ul>
 
             <div class="notation-help">
                 <h3>Notation Guide</h3>
@@ -774,6 +775,7 @@
         display.innerHTML = `
             <div class="current-step">${isDone ? '✅ Solved!' : current}</div>
             <div class="step-info">${isDone ? 'The cube is solved! Click Reset to try again.' : progress + ' — Click "Next Step ▶" to continue'}</div>
+            <div style="color:#888;font-size:0.78em;margin-top:4px;">Solution (inverse of formula):</div>
             <div class="all-steps">${stepsHtml}</div>
         `;
     }
