@@ -645,6 +645,7 @@
         setTimeout(() => {
             applyMove(move);
             renderCube();
+            syncNetFromCubies();
             animating = false;
         }, ANIM_DURATION + 30);
     }
@@ -683,6 +684,7 @@
         cubies = solvedCubies();
         viewRotX = -30; viewRotY = -40;
         renderCube();
+        syncNetFromCubies();
         solveSteps = [];
         currentStepIndex = -1;
         updateStepDisplay();
@@ -732,12 +734,14 @@
     function solveStepByStep() {
         if (selectedPattern === null) return;
         const pattern = patterns[selectedPattern];
-        // Apply the pattern instantly (no animation), then show solving steps
+        // Reset to solved, then apply the pattern
+        cubies = solvedCubies();
         const applyMoves = expandFormula(pattern.formula);
         for (const m of applyMoves) {
             applyMove(m);
         }
         renderCube();
+        syncNetFromCubies();
         // The inverse is the solution
         solveSteps = expandFormula(pattern.inverse);
         currentStepIndex = -1;
@@ -852,6 +856,26 @@
 
     // Net state: 6 faces x 4 stickers
     let netState = { U:[null,null,null,null], D:[null,null,null,null], F:[null,null,null,null], B:[null,null,null,null], R:[null,null,null,null], L:[null,null,null,null] };
+
+    // Sync the 2D net from the current 3D cubies state
+    function syncNetFromCubies() {
+        const mapping = {
+            U: [ {pos:[0,1,0],key:'py'}, {pos:[1,1,0],key:'py'}, {pos:[0,1,1],key:'py'}, {pos:[1,1,1],key:'py'} ],
+            D: [ {pos:[0,0,1],key:'ny'}, {pos:[1,0,1],key:'ny'}, {pos:[0,0,0],key:'ny'}, {pos:[1,0,0],key:'ny'} ],
+            F: [ {pos:[0,1,1],key:'pz'}, {pos:[1,1,1],key:'pz'}, {pos:[0,0,1],key:'pz'}, {pos:[1,0,1],key:'pz'} ],
+            B: [ {pos:[1,1,0],key:'nz'}, {pos:[0,1,0],key:'nz'}, {pos:[1,0,0],key:'nz'}, {pos:[0,0,0],key:'nz'} ],
+            R: [ {pos:[1,1,1],key:'px'}, {pos:[1,1,0],key:'px'}, {pos:[1,0,1],key:'px'}, {pos:[1,0,0],key:'px'} ],
+            L: [ {pos:[0,1,0],key:'nx'}, {pos:[0,1,1],key:'nx'}, {pos:[0,0,0],key:'nx'}, {pos:[0,0,1],key:'nx'} ],
+        };
+        for (const [face, tiles] of Object.entries(mapping)) {
+            for (let i = 0; i < 4; i++) {
+                const {pos, key} = tiles[i];
+                const cubie = cubies.find(cb => cb.pos[0]===pos[0] && cb.pos[1]===pos[1] && cb.pos[2]===pos[2]);
+                netState[face][i] = cubie.faces[key];
+            }
+        }
+        renderNet();
+    }
 
     function renderPalette() {
         const pal = document.getElementById('color-palette');
@@ -1373,7 +1397,7 @@
     })();
 
     renderPalette();
-    renderNet();
+    syncNetFromCubies();
     </script>
 </body>
 </html>
