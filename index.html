@@ -1426,8 +1426,37 @@
             return Math.max(oriDist[oi], permDist[pi]);
         }
 
-        return { getHeuristic, oriDist, permDist, encodeOri, encodePerm, MOVE_DEFS, POS_ORDER, PIECE_INDEX, TWIST_TABLE };
+        return { getHeuristic, oriDist, permDist, encodeOri, encodePerm, MOVE_DEFS, POS_ORDER, PIECE_INDEX, TWIST_TABLE, SOLVED_PIECES };
     })();
+
+    // Derive the face-color scheme from the fixed corner at [0,0,0].
+    // This makes the solver work regardless of how the user holds their physical cube.
+    function getColorScheme(cubieArr) {
+        const fixed = cubieArr.find(c => c.pos[0]===0 && c.pos[1]===0 && c.pos[2]===0);
+        const dColor = fixed.faces.ny; // Down
+        const lColor = fixed.faces.nx; // Left
+        const bColor = fixed.faces.nz; // Back
+        const OPPOSITES = { W:'Y', Y:'W', R:'O', O:'R', B:'G', G:'B' };
+        const uColor = OPPOSITES[dColor];
+        const rColor = OPPOSITES[lColor];
+        const fColor = OPPOSITES[bColor];
+
+        // Compute what piece belongs at each of the 7 movable positions when solved
+        const positionColors = [
+            [dColor, rColor, bColor], // [1,0,0] DRB
+            [uColor, lColor, bColor], // [0,1,0] ULB
+            [uColor, rColor, bColor], // [1,1,0] URB
+            [dColor, lColor, fColor], // [0,0,1] DLF
+            [dColor, rColor, fColor], // [1,0,1] DRF
+            [uColor, lColor, fColor], // [0,1,1] ULF
+            [uColor, rColor, fColor], // [1,1,1] URF
+        ];
+        const solvedPieces = positionColors.map(c => [...c].sort().join(''));
+        const pieceIndex = {};
+        solvedPieces.forEach((key, i) => pieceIndex[key] = i);
+
+        return { udColors: [uColor, dColor], solvedPieces, pieceIndex };
+    }
 
     // ===== PRE-SOLVE VALIDATION =====
     // Checks whether a cube state is physically achievable before searching.
@@ -1516,6 +1545,11 @@
         // We maintain ori/perm indices incrementally using the MOVE_DEFS
         const { getHeuristic, oriDist, permDist, encodeOri, encodePerm, MOVE_DEFS, POS_ORDER, PIECE_INDEX, TWIST_TABLE } = PRUNING;
 
+        // Derive color scheme from the fixed corner — supports any cube orientation
+        const scheme = getColorScheme(startCubies);
+        const dynPieceIndex = scheme.pieceIndex;
+        const dynUdColors = scheme.udColors;
+
         // Get initial orientation and permutation
         function extractState(cubieArr) {
             const twists = [0,0,0,0,0,0,0];
@@ -1528,8 +1562,8 @@
                     if (cubie.faces[k] !== 'X') visible.push({ key: k, color: cubie.faces[k] });
                 }
                 const colorKey = visible.map(v => v.color).sort().join('');
-                perm[i] = PIECE_INDEX[colorKey];
-                const udSticker = visible.find(v => v.color === 'W' || v.color === 'Y');
+                perm[i] = dynPieceIndex[colorKey];
+                const udSticker = visible.find(v => dynUdColors.includes(v.color));
                 const posKey = POS_ORDER[i].join(',');
                 twists[i] = TWIST_TABLE[posKey][udSticker.key];
             }
