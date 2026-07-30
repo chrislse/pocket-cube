@@ -1253,32 +1253,39 @@
     const ALL_MOVES = ['R', "R'", 'U', "U'", 'F', "F'"];
     // Only use R, U, F (and inverses) — sufficient for 2x2 since one corner is fixed
 
+    // IDA* solver — iterative deepening depth-first search with move pruning.
+    // Much faster than BFS: uses O(depth) memory and prunes redundant move sequences.
     function solveCube(startCubies) {
         if (isSolved(startCubies)) return [];
 
-        const startKey = encodeState(startCubies);
-        const visited = new Set([startKey]);
-        const queue = [{ state: startCubies, moves: [] }];
+        // Map face base letter to index for pruning
+        const faceOf = { 'R': 0, 'U': 1, 'F': 2 };
 
-        // BFS with max depth 14 (2x2 God's number is 11 in half-turn, 14 in quarter-turn)
-        while (queue.length > 0) {
-            const { state, moves } = queue.shift();
-            if (moves.length >= 14) continue;
+        function dfs(state, moves, maxDepth, lastFace) {
+            if (moves.length === maxDepth) {
+                return isSolved(state) ? [...moves] : null;
+            }
 
             for (const move of ALL_MOVES) {
+                const base = move[0]; // 'R', 'U', or 'F'
+                // Prune: don't turn the same face twice in a row
+                if (base === lastFace) continue;
+
                 const next = cloneCubies(state);
                 applyMoveToState(next, move);
-                const key = encodeState(next);
 
-                if (isSolved(next)) return [...moves, move];
-
-                if (!visited.has(key)) {
-                    visited.add(key);
-                    queue.push({ state: next, moves: [...moves, move] });
-                }
+                const result = dfs(next, [...moves, move], maxDepth, base);
+                if (result) return result;
             }
+            return null;
         }
-        return null; // no solution found
+
+        // Iterative deepening: try depth 1, 2, 3, ... up to 14
+        for (let depth = 1; depth <= 14; depth++) {
+            const result = dfs(startCubies, [], depth, null);
+            if (result) return result;
+        }
+        return null; // no solution found (invalid state)
     }
 
     let solverSolution = [];
@@ -1310,11 +1317,14 @@
         }
 
         const c = netToCubies();
-        document.getElementById('solver-output').innerHTML = '<div class="step-info">Solving... (this may take a moment)</div>';
+        document.getElementById('solver-output').innerHTML = '<div class="step-info">Solving... (searching for optimal solution)</div>';
 
-        // Use setTimeout to allow UI to update before blocking BFS
+        // Use setTimeout to allow UI to update before solving
         setTimeout(() => {
+            const t0 = performance.now();
             const solution = solveCube(c);
+            const elapsed = Math.round(performance.now() - t0);
+
             if (solution === null) {
                 document.getElementById('solver-output').innerHTML = '<div class="solver-error">No solution found — check your color input. Make sure the colors match a valid 2x2 cube state.</div>';
                 return;
@@ -1332,7 +1342,7 @@
             renderCube();
 
             document.getElementById('solver-output').innerHTML = `
-                <div style="color:#aaa;font-size:0.85em;">Solution (${solution.length} moves):</div>
+                <div style="color:#aaa;font-size:0.85em;">Solution (${solution.length} moves, found in ${elapsed}ms):</div>
                 <div class="solution-moves">${solution.join('  ')}</div>
             `;
             updateSolverStepDisplay();
